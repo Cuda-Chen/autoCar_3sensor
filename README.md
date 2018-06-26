@@ -1,7 +1,11 @@
 # autoCar_3sensor
 Auto car with 3 IR sensors.
 
-# How to Compile
+# How to Compile and Flash
+## compile
+Use Arduino IDE to compile. <br>
+## flash 
+Use Arduino IDE to flash. <br>
 
 # Note
 * This project uses the following two libraries:

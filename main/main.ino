@@ -8,16 +8,46 @@ void setup() {
 }
 
 void loop() {
-  int raw_data = analogRead(3); // get A3 input value
-
+  int raw_data_left = analogRead(1); // get A1 (left) input value
+  int raw_data_middle = analogRead(3); // get A3 (middle) input value
+  int raw_data_right = analogRead(5); // get A5 (right) input value
+  
   // here I use 500 as threshold
-  if(raw_data < 500) {
-    DriveSingleMotor(MOTOR_M1, 5, DIR_FORWARD); // right motor starts to run in 5 speed
-    DriveSingleMotor(MOTOR_M2, PWR_STOP, DIR_FORWARD); 
-    digitalWrite(13, HIGH); // LED on
-  } else {
-    DriveSingleMotor(MOTOR_M1, PWR_STOP, DIR_FORWARD); 
-    DriveSingleMotor(MOTOR_M2, 5, DIR_FORWARD); // left motor starts to run in 5 speed
-    digitalWrite(13, LOW); // LED off
+  // black: > 500
+  // white: < 500
+  bool left = raw_data_left > 500 ? true : false;
+  bool middle = raw_data_middle > 500 ? true : false;
+  bool right = raw_data_right > 500 ? true : false;
+
+  // if middle detects black
+  if(middle) {
+    if(left && right) { // cliff
+      // stop
+      DriveSingleMotor(MOTOR_M1, PWR_STOP, DIR_FORWARD); 
+      DriveSingleMotor(MOTOR_M2, PWR_STOP, DIR_FORWARD); 
+      // pause for 0.5 sec
+      delay(500);
+
+      // then go backward
+      DriveSingleMotor(MOTOR_M1, PWR_STOP, DIR_BACKWARD); 
+      DriveSingleMotor(MOTOR_M2, PWR_STOP, DIR_BACKWARD); 
+    } else if(left) { // turn left
+      DriveSingleMotor(MOTOR_M1, 2, DIR_FORWARD); 
+      DriveSingleMotor(MOTOR_M2, PWR_STOP, DIR_FORWARD); 
+    } else if(right) { // turn right
+      DriveSingleMotor(MOTOR_M1, PWR_STOP, DIR_FORWARD); 
+      DriveSingleMotor(MOTOR_M2, 2, DIR_FORWARD); 
+    } else { // go straight
+      DriveSingleMotor(MOTOR_M1, 2, DIR_FORWARD); 
+      DriveSingleMotor(MOTOR_M2, 2, DIR_FORWARD); 
+    }
   }
+
+  // if all detects white, which means the car is out of track
+  if(middle && left && right) { // go backward
+    DriveSingleMotor(MOTOR_M1, 2, DIR_BACKWARD); 
+    DriveSingleMotor(MOTOR_M2, 2, DIR_BACKWARD); 
+  }
+
+  delay(1000);
 }
