@@ -5,6 +5,7 @@ void setup() {
   L298_setup(); // initialize L298 motor control board
   DriveSingleMotor(MOTOR_M1, PWR_STOP, DIR_FORWARD); // set right motor to PWR_STOP
   DriveSingleMotor(MOTOR_M2, PWR_STOP, DIR_FORWARD); // set left motor to PWR_STOP
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
@@ -18,6 +19,8 @@ void loop() {
   bool left = raw_data_left > 500 ? true : false;
   bool middle = raw_data_middle > 500 ? true : false;
   bool right = raw_data_right > 500 ? true : false;
+
+  digitalWrite(LED_BUILTIN, HIGH);
 
   // if middle detects black
   if(middle) {
@@ -41,13 +44,19 @@ void loop() {
       DriveSingleMotor(MOTOR_M1, 2, DIR_FORWARD); 
       DriveSingleMotor(MOTOR_M2, 2, DIR_FORWARD); 
     }
+
+    delay(1000);
   }
 
   // if all detects white, which means the car is out of track
   if(middle && left && right) { // go backward
     DriveSingleMotor(MOTOR_M1, 2, DIR_BACKWARD); 
     DriveSingleMotor(MOTOR_M2, 2, DIR_BACKWARD); 
+    delay(1000);
   }
 
+  DriveSingleMotor(MOTOR_M1, PWR_STOP, DIR_FORWARD); 
+  DriveSingleMotor(MOTOR_M2, PWR_STOP, DIR_FORWARD);
+  digitalWrite(LED_BUILTIN, LOW);
   delay(1000);
 }
